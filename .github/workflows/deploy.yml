@@ -1,0 +1,23 @@
+name: Deploy Erimodo bot
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Deploy Erimodo on server
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          directory: ./ansible
+          playbook: deploy.yml
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: ${{ secrets.INVENTORY }}
