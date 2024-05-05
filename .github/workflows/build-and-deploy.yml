@@ -5,38 +5,15 @@ on:
     branches:
       - main
 
-env:
-  REGISTRY: ${{ secrets.REGISTRY }}
-  SECRET_KEY: ${{ secrets.SECRET_KEY }}
-  IMAGE_NAME: erimodo
-  TAG: latest
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-
-      - name: Build and push docker image
-        run: |
-          docker login "$REGISTRY" -u nologin --password-stdin <<< "$SECRET_KEY"
-          docker buildx create --use
-          docker buildx build -t "$REGISTRY/$IMAGE_NAME:$TAG" --push .
-
-
   deploy:
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Deploy image on server
+      - name: Deploy
         uses: dawidd6/action-ansible-playbook@v2
         with:
           directory: ./ansible

@@ -1,29 +1,27 @@
 ---
-- name: Deploy hugo blog
+- name: Deploy erimodo bot
   hosts: all
   become: yes
 
   vars:
-    REGISTRY: "{{ lookup('ansible.builtin.env', 'REGISTRY') }}"
-    SECRET_KEY: "{{ lookup('ansible.builtin.env', 'SECRET_KEY') }}"
-    IMAGE_NAME: "{{ lookup('ansible.builtin.env', 'IMAGE_NAME') }}"
-    TAG: "{{ lookup('ansible.builtin.env', 'TAG') }}"
-    FULL_IMAGE_NAME: "{{ REGISTRY }}/{{ IMAGE_NAME }}:{{ TAG }}"
+    erimodo_dir: /home/tbellavia/Erimodo
 
   tasks:
-    - name: Login to docker registry
-      community.docker.docker_login:
-        registry: "{{ REGISTRY }}"
-        password: "{{ SECRET_KEY }}"
-        username: "nologin"
-        state: present
+    - name: Pull repository
+      ansible.builtin.git:
+        repo: https://github.com/Cardiox12/erimodo.git
+        clone: true
+        dest: "{{ erimodo_dir }}"
+        update: true
 
-    - name: Pull new docker image version
-      command: docker pull "{{ FULL_IMAGE_NAME }}"
-
-    - name: Remove docker container
-      command: docker container stop "{{ IMAGE_NAME }}"
+    - name: Remove previous containers
+      ansible.builtin.command: 
+        cmd: docker-compose down --volumes
+        chdir: "{{ erimodo_dir }}"
       ignore_errors: true
 
-    - name: Run docker container
-      command: docker run -it -d --rm --name "{{ IMAGE_NAME }}" "{{ FULL_IMAGE_NAME }}"
+    - name: Run docker compose
+      ansible.builtin.command: 
+        cmd: docker-compose up -d
+        chdir: "{{ erimodo_dir }}"
+      
