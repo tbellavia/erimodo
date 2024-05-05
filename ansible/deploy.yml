@@ -7,7 +7,7 @@
     - name: Copy files on the server
       ansible.builtin.copy:
         src: ../
-        dest: tbellavia/Erimodo
+        dest: /home/tbellavia/Erimodo
         mode: "0644"
 
     - name: Remove docker container
